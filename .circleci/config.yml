@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: ubuntu:18.04
+    steps:
+    - checkout
+    - run:
+        name: Install git, make, and curl
+        command: apt update && apt install -y git make curl
+    - run:
+        name: Install Docker client
+        command: curl -L -o /tmp/docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-18.09.3.tgz && tar -xz -C /tmp -f /tmp/docker.tgz && mv /tmp/docker/* /usr/bin
+    - setup_remote_docker:
+        docker_layer_caching: true
+        version: 18.09.3
+    - run:
+        name: Login
+        command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+    - run:
+        name: Build
+        command: GIT_BRANCH=$CIRCLE_BRANCH make
+    - run:
+        name: Test
+        command: GIT_BRANCH=$CIRCLE_BRANCH make test
+    - run:
+        name: Push
+        command: GIT_BRANCH=$CIRCLE_BRANCH make push
