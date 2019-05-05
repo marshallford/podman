@@ -15,14 +15,14 @@ jobs:
         docker_layer_caching: true
         version: 18.09.3
     - run:
-        name: Login
-        command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-    - run:
         name: Build
         command: GIT_BRANCH=$CIRCLE_BRANCH make
     - run:
         name: Test
         command: GIT_BRANCH=$CIRCLE_BRANCH make test
+    - run:
+        name: Login
+        command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
     - run:
         name: Push
         command: GIT_BRANCH=$CIRCLE_BRANCH make push

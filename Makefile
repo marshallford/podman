@@ -19,12 +19,18 @@ build:
     --build-arg VCS_REF=$(GIT_COMMIT) \
     --build-arg PODMAN_VERSION=$(PODMAN_VERSION) \
     --build-arg IMAGE_NAME=$(IMAGE_NAME) \
-    -t $(IMAGE_NAME):latest \
-    -t $(IMAGE_NAME):$(IMAGE_TAG) .
+		-t $(IMAGE_NAME):$(GIT_COMMIT) \
+    -t $(IMAGE_NAME):$(IMAGE_TAG) \
+		-t $(IMAGE_NAME):latest .
 
 push:
+	docker push $(IMAGE_NAME):$(GIT_COMMIT)
 	docker push $(IMAGE_NAME):$(IMAGE_TAG)
 	if [ -n "$(PUSH_LATEST_TAG)" ]; then docker push $(IMAGE_NAME):latest; fi
 
-test:
+version:
 	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) --version
+
+test:
+	docker run --rm --privileged $(IMAGE_NAME):$(IMAGE_TAG) \
+	--cgroup-manager cgroupfs run --rm alpine echo hello from alpine in podman container
