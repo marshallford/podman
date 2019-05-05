@@ -33,4 +33,5 @@ version:
 
 test:
 	docker run --rm --privileged $(IMAGE_NAME):$(IMAGE_TAG) \
-	--cgroup-manager cgroupfs run --rm alpine echo hello from alpine in podman container
+	--cgroup-manager cgroupfs --storage-driver vfs \
+	run --rm alpine echo hello from alpine in podman container
