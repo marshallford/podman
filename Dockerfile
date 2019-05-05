@@ -1,4 +1,4 @@
-FROM fedora:29
+FROM fedora:30
 LABEL maintainer="Marshall Ford <inbox@marshallford.me>"
 
 ARG BUILD_DATE
