@@ -35,5 +35,5 @@ version:
 	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) --version
 
 test:
-	docker run --rm --privileged $(IMAGE_NAME):$(IMAGE_TAG) \
+	docker run --rm --privileged -v /var/lib/containers $(IMAGE_NAME):$(IMAGE_TAG) \
 	run --rm alpine echo hello from alpine in podman container
