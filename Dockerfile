@@ -15,6 +15,8 @@ LABEL org.label-schema.schema-version="1.0" \
       org.label-schema.url="https://podman.io"
 
 RUN dnf upgrade -y && dnf install -y podman-$PODMAN_VERSION && dnf clean all -y
+COPY files/libpod.conf /usr/share/containers/libpod.conf
+COPY files/storage.conf /etc/containers/storage.conf
 
 ENTRYPOINT ["podman"]
 CMD ["help"]

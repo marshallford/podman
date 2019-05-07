@@ -28,10 +28,12 @@ push:
 	docker push $(IMAGE_NAME):$(IMAGE_TAG)
 	if [ -n "$(PUSH_LATEST_TAG)" ]; then docker push $(IMAGE_NAME):latest; fi
 
+run:
+	docker run -it --rm --privileged --entrypoint=/bin/bash $(IMAGE_NAME):$(IMAGE_TAG)
+
 version:
 	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) --version
 
 test:
 	docker run --rm --privileged $(IMAGE_NAME):$(IMAGE_TAG) \
-	--cgroup-manager cgroupfs --storage-driver vfs \
 	run --rm alpine echo hello from alpine in podman container
