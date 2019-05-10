@@ -32,7 +32,7 @@ run:
 	docker run -it --rm --privileged --entrypoint=/bin/bash $(IMAGE_NAME):$(IMAGE_TAG)
 
 version:
-	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) --version
+	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) version
 
 test:
 	docker run --rm --privileged -v /var/lib/containers $(IMAGE_NAME):$(IMAGE_TAG) \
