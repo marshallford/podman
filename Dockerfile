@@ -4,8 +4,10 @@ ARG CONMON_VERSION
 ARG RUNC_VERSION
 ARG CNI_PLUGINS_VERSION
 ARG PODMAN_VERSION
+ARG PODMAN_BIN
 
 RUN apk --no-cache add bash btrfs-progs-dev build-base device-mapper git glib-dev go-md2man gpgme-dev ip6tables libassuan-dev libseccomp-dev libselinux-dev lvm2-dev openssl ostree-dev pkgconf protobuf-c-dev protobuf-dev
+RUN git config --global advice.detachedHead false
 
 RUN git clone --branch v$CONMON_VERSION https://github.com/containers/conmon $GOPATH/src/github.com/containers/conmon && \
     cd $GOPATH/src/github.com/containers/conmon && make
@@ -14,7 +16,7 @@ RUN git clone --branch v$RUNC_VERSION https://github.com/opencontainers/runc $GO
 RUN git clone --branch v$CNI_PLUGINS_VERSION https://github.com/containernetworking/plugins $GOPATH/src/github.com/containernetworking/plugins && \
     cd $GOPATH/src/github.com/containernetworking/plugins && ./build_linux.sh
 RUN git clone --branch v$PODMAN_VERSION https://github.com/containers/libpod $GOPATH/src/github.com/containers/libpod && \
-    cd $GOPATH/src/github.com/containers/libpod && make BUILDTAGS="selinux seccomp apparmor"
+    cd $GOPATH/src/github.com/containers/libpod && make varlink_generate $PODMAN_BIN BUILDTAGS="selinux seccomp apparmor"
 
 FROM alpine:3.10.0
 

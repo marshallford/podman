@@ -13,30 +13,51 @@ else
   IMAGE_TAG = $(GIT_COMMIT)
 endif
 
-build:
+IMAGE_NAME = $(IMAGE_NAME_PREFIX)/podman
+PODMAN_RUN = docker run --rm --privileged -v /tmp/podman:/var/lib/containers $(IMAGE_NAME):latest
+
+build: build/podman build/podman-remote
+
+build/podman build/podman-remote:
 	docker build \
-    --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-    --build-arg VCS_REF=$(GIT_COMMIT) \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		--build-arg VCS_REF=$(GIT_COMMIT) \
 		--build-arg CONMON_VERSION=$(CONMON_VERSION) \
 		--build-arg RUNC_VERSION=$(RUNC_VERSION) \
 		--build-arg CNI_PLUGINS_VERSION=$(CNI_PLUGINS_VERSION) \
-    --build-arg PODMAN_VERSION=$(PODMAN_VERSION) \
-    --build-arg IMAGE_NAME=$(IMAGE_NAME) \
-		-t $(IMAGE_NAME):$(GIT_COMMIT) \
-    -t $(IMAGE_NAME):$(IMAGE_TAG) \
-		-t $(IMAGE_NAME):latest .
+		--build-arg PODMAN_VERSION=$(PODMAN_VERSION) \
+		--build-arg IMAGE_NAME=$(IMAGE_NAME_PREFIX)/$(@F) \
+		--build-arg PODMAN_BIN=$(@F) \
+		-t $(IMAGE_NAME_PREFIX)/$(@F):$(GIT_COMMIT) \
+		-t $(IMAGE_NAME_PREFIX)/$(@F):$(IMAGE_TAG) \
+		-t $(IMAGE_NAME_PREFIX)/$(@F):latest .
 
-push:
-	docker push $(IMAGE_NAME):$(GIT_COMMIT)
-	docker push $(IMAGE_NAME):$(IMAGE_TAG)
-	if [ -n "$(PUSH_LATEST_TAG)" ]; then docker push $(IMAGE_NAME):latest; fi
+push: push/podman push/podman-remote
+
+push/podman push/podman-remote:
+	docker push $(IMAGE_NAME_PREFIX)/$(@F):$(IMAGE_TAG)
+	if [ -n "$(PUSH_LATEST_TAG)" ]; then docker push $(IMAGE_NAME_PREFIX)/$(@F):latest; fi
 
 run:
-	docker run -it --rm --privileged --entrypoint=/bin/bash $(IMAGE_NAME):$(IMAGE_TAG)
+	docker run -it --rm --privileged --entrypoint=/bin/sh $(IMAGE_NAME):latest
 
 version:
-	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) version
+	$(PODMAN_RUN) version
+
+info:
+	$(PODMAN_RUN) info
 
 test:
-	docker run --rm --privileged -v /var/lib/containers $(IMAGE_NAME):$(IMAGE_TAG) \
-	run --rm alpine echo hello from alpine in podman container
+	$(PODMAN_RUN) run --rm alpine echo hello from alpine in podman container
+
+.PHONY: \
+	build \
+	build/podman \
+	build/podman-remote \
+	push \
+	push/podman\
+	push/podman-remote \
+	run \
+	version \
+	info \
+	test
