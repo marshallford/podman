@@ -17,6 +17,9 @@ build:
 	docker build \
     --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
     --build-arg VCS_REF=$(GIT_COMMIT) \
+		--build-arg CONMON_VERSION=$(CONMON_VERSION) \
+		--build-arg RUNC_VERSION=$(RUNC_VERSION) \
+		--build-arg CNI_PLUGINS_VERSION=$(CNI_PLUGINS_VERSION) \
     --build-arg PODMAN_VERSION=$(PODMAN_VERSION) \
     --build-arg IMAGE_NAME=$(IMAGE_NAME) \
 		-t $(IMAGE_NAME):$(GIT_COMMIT) \
