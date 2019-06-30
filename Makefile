@@ -50,6 +50,10 @@ info:
 test:
 	$(PODMAN_RUN) run --rm alpine echo hello from alpine in podman container
 
+dive:
+	docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock \
+  wagoodman/dive:v0.7.2 $(IMAGE_NAME):latest
+
 .PHONY: \
 	build \
 	build/podman \
@@ -60,4 +64,5 @@ test:
 	run \
 	version \
 	info \
-	test
+	test \
+	dive
