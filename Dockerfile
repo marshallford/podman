@@ -11,11 +11,11 @@ RUN git config --global advice.detachedHead false
 RUN git clone --branch v$CONMON_VERSION https://github.com/containers/conmon $GOPATH/src/github.com/containers/conmon && \
     cd $GOPATH/src/github.com/containers/conmon && make
 RUN git clone --branch v$RUNC_VERSION https://github.com/opencontainers/runc $GOPATH/src/github.com/opencontainers/runc && \
-    cd $GOPATH/src/github.com/opencontainers/runc && make BUILDTAGS="seccomp apparmor selinux ambient"
+    cd $GOPATH/src/github.com/opencontainers/runc && EXTRA_LDFLAGS="-s -w" make BUILDTAGS="seccomp apparmor selinux ambient"
 RUN git clone --branch v$CNI_PLUGINS_VERSION https://github.com/containernetworking/plugins $GOPATH/src/github.com/containernetworking/plugins && \
-    cd $GOPATH/src/github.com/containernetworking/plugins && ./build_linux.sh
+    cd $GOPATH/src/github.com/containernetworking/plugins && GOFLAGS="-ldflags=-s -ldflags=-w" ./build_linux.sh
 RUN git clone --branch v$PODMAN_VERSION https://github.com/containers/libpod $GOPATH/src/github.com/containers/libpod && \
-    cd $GOPATH/src/github.com/containers/libpod && make varlink_generate <BIN> BUILDTAGS="selinux seccomp apparmor"
+    cd $GOPATH/src/github.com/containers/libpod && LDFLAGS="-s -w" make varlink_generate <BIN> BUILDTAGS="selinux seccomp apparmor"
 
 FROM alpine:3.10.0
 
