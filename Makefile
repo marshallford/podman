@@ -14,12 +14,13 @@ else
 endif
 
 IMAGE_NAME = $(IMAGE_NAME_PREFIX)/podman
-PODMAN_RUN = docker run --rm --privileged -v /tmp/podman:/var/lib/containers $(IMAGE_NAME):latest
+RUN = docker run --rm --privileged -v /tmp/podman:/var/lib/containers
+PODMAN_RUN = $(RUN) $(IMAGE_NAME):latest
 
 build: build/podman build/podman-remote
 
 build/podman build/podman-remote:
-	docker build \
+	sed 's/<BIN>/$(@F)/g' Dockerfile | docker build -f - \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		--build-arg VCS_REF=$(GIT_COMMIT) \
 		--build-arg CONMON_VERSION=$(CONMON_VERSION) \
@@ -27,7 +28,6 @@ build/podman build/podman-remote:
 		--build-arg CNI_PLUGINS_VERSION=$(CNI_PLUGINS_VERSION) \
 		--build-arg PODMAN_VERSION=$(PODMAN_VERSION) \
 		--build-arg IMAGE_NAME=$(IMAGE_NAME_PREFIX)/$(@F) \
-		--build-arg PODMAN_BIN=$(@F) \
 		-t $(IMAGE_NAME_PREFIX)/$(@F):$(GIT_COMMIT) \
 		-t $(IMAGE_NAME_PREFIX)/$(@F):$(IMAGE_TAG) \
 		-t $(IMAGE_NAME_PREFIX)/$(@F):latest .
@@ -39,7 +39,7 @@ push/podman push/podman-remote:
 	if [ -n "$(PUSH_LATEST_TAG)" ]; then docker push $(IMAGE_NAME_PREFIX)/$(@F):latest; fi
 
 run:
-	docker run -it --rm --privileged --entrypoint=/bin/sh $(IMAGE_NAME):latest
+	$(RUN) -it --entrypoint=/bin/sh $(IMAGE_NAME):latest
 
 version:
 	$(PODMAN_RUN) version
