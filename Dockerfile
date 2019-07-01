@@ -42,8 +42,7 @@ COPY --from=builder /go/src/github.com/containernetworking/plugins/bin/ /usr/lib
 COPY --from=builder /go/src/github.com/containers/libpod/bin/ /usr/bin/
 
 COPY files/87-podman-bridge.conflist /etc/cni/net.d/
-COPY files/registries.conf files/policy.json files/storage.conf /etc/containers/
-COPY files/libpod.conf /usr/share/containers/libpod.conf
+COPY files/libpod.conf files/registries.conf files/policy.json files/storage.conf /etc/containers/
 
 ENTRYPOINT ["<BIN>"]
 CMD ["help"]
