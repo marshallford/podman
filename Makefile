@@ -13,27 +13,56 @@ else
   IMAGE_TAG = $(GIT_COMMIT)
 endif
 
-build:
-	docker build \
-    --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-    --build-arg VCS_REF=$(GIT_COMMIT) \
-    --build-arg PODMAN_VERSION=$(PODMAN_VERSION) \
-    --build-arg IMAGE_NAME=$(IMAGE_NAME) \
-		-t $(IMAGE_NAME):$(GIT_COMMIT) \
-    -t $(IMAGE_NAME):$(IMAGE_TAG) \
-		-t $(IMAGE_NAME):latest .
+IMAGE_NAME = $(IMAGE_NAME_PREFIX)/podman
+RUN = docker run --rm --privileged -v /tmp/podman:/var/lib/containers
+PODMAN_RUN = $(RUN) $(IMAGE_NAME):latest
 
-push:
-	docker push $(IMAGE_NAME):$(GIT_COMMIT)
-	docker push $(IMAGE_NAME):$(IMAGE_TAG)
-	if [ -n "$(PUSH_LATEST_TAG)" ]; then docker push $(IMAGE_NAME):latest; fi
+build: build/podman build/podman-remote
+
+build/podman build/podman-remote:
+	sed 's/<BIN>/$(@F)/g' Dockerfile | docker build -f - \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		--build-arg VCS_REF=$(GIT_COMMIT) \
+		--build-arg CONMON_VERSION=$(CONMON_VERSION) \
+		--build-arg RUNC_VERSION=$(RUNC_VERSION) \
+		--build-arg CNI_PLUGINS_VERSION=$(CNI_PLUGINS_VERSION) \
+		--build-arg PODMAN_VERSION=$(PODMAN_VERSION) \
+		--build-arg IMAGE_NAME=$(IMAGE_NAME_PREFIX)/$(@F) \
+		-t $(IMAGE_NAME_PREFIX)/$(@F):$(GIT_COMMIT) \
+		-t $(IMAGE_NAME_PREFIX)/$(@F):$(IMAGE_TAG) \
+		-t $(IMAGE_NAME_PREFIX)/$(@F):latest .
+
+push: push/podman push/podman-remote
+
+push/podman push/podman-remote:
+	docker push $(IMAGE_NAME_PREFIX)/$(@F):$(IMAGE_TAG)
+	if [ -n "$(PUSH_LATEST_TAG)" ]; then docker push $(IMAGE_NAME_PREFIX)/$(@F):latest; fi
 
 run:
-	docker run -it --rm --privileged --entrypoint=/bin/bash $(IMAGE_NAME):$(IMAGE_TAG)
+	$(RUN) -it --entrypoint=/bin/sh $(IMAGE_NAME):latest
 
 version:
-	docker run --rm $(IMAGE_NAME):$(IMAGE_TAG) version
+	$(PODMAN_RUN) version
+
+info:
+	$(PODMAN_RUN) info
 
 test:
-	docker run --rm --privileged -v /var/lib/containers $(IMAGE_NAME):$(IMAGE_TAG) \
-	run --rm alpine echo hello from alpine in podman container
+	$(PODMAN_RUN) run --rm alpine echo hello from alpine in podman container
+
+dive:
+	docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock \
+  wagoodman/dive:v0.7.2 $(IMAGE_NAME):latest
+
+.PHONY: \
+	build \
+	build/podman \
+	build/podman-remote \
+	push \
+	push/podman\
+	push/podman-remote \
+	run \
+	version \
+	info \
+	test \
+	dive

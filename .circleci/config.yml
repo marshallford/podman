@@ -21,6 +21,9 @@ jobs:
         name: Get Version
         command: GIT_BRANCH=$CIRCLE_BRANCH make version
     - run:
+        name: Get Info
+        command: GIT_BRANCH=$CIRCLE_BRANCH make info
+    - run:
         name: Test
         command: GIT_BRANCH=$CIRCLE_BRANCH make test
     - run:
