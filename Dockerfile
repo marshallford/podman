@@ -19,20 +19,19 @@ RUN git clone --branch v$PODMAN_VERSION https://github.com/containers/libpod $GO
 
 FROM alpine:3.10.0
 
-ARG BUILD_DATE
-ARG VCS_REF
+ARG CREATED
+ARG REVISION
 ARG PODMAN_VERSION
 ARG IMAGE_NAME
 
 LABEL maintainer="Marshall Ford <inbox@marshallford.me>"
 
-LABEL org.label-schema.schema-version="1.0" \
-      org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.version=$PODMAN_VERSION \
-      org.label-schema.name=$IMAGE_NAME \
-      org.label-schema.vcs-url="https://github.com/marshallford/podman" \
-      org.label-schema.url="https://podman.io"
+LABEL org.opencontainers.image.created=$CREATED \
+      org.opencontainers.image.revision=$REVISION \
+      org.opencontainers.image.version=$PODMAN_VERSION \
+      org.opencontainers.image.title=$IMAGE_NAME \
+      org.opencontainers.image.source="https://github.com/marshallford/podman" \
+      org.opencontainers.image.url="https://podman.io"
 
 RUN apk --no-cache add device-mapper gpgme ip6tables libseccomp libselinux ostree
 

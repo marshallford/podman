@@ -21,8 +21,8 @@ build: build/podman build/podman-remote
 
 build/podman build/podman-remote:
 	sed 's/<BIN>/$(@F)/g' Dockerfile | docker build -f - \
-		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-		--build-arg VCS_REF=$(GIT_COMMIT) \
+		--build-arg CREATED=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+		--build-arg REVISION=$(GIT_COMMIT) \
 		--build-arg CONMON_VERSION=$(CONMON_VERSION) \
 		--build-arg RUNC_VERSION=$(RUNC_VERSION) \
 		--build-arg CNI_PLUGINS_VERSION=$(CNI_PLUGINS_VERSION) \
