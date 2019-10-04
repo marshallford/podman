@@ -1,4 +1,4 @@
-FROM golang:1.12.7-alpine3.10 AS builder
+FROM golang:1.13.1-alpine3.10 AS builder
 
 ARG CONMON_VERSION
 ARG RUNC_VERSION
@@ -17,7 +17,7 @@ RUN git clone --branch v$CNI_PLUGINS_VERSION https://github.com/containernetwork
 RUN git clone --branch v$PODMAN_VERSION https://github.com/containers/libpod $GOPATH/src/github.com/containers/libpod && \
     cd $GOPATH/src/github.com/containers/libpod && LDFLAGS="-s -w" make varlink_generate <BIN> BUILDTAGS="selinux seccomp apparmor"
 
-FROM alpine:3.10.1
+FROM alpine:3.10.2
 
 ARG CREATED
 ARG REVISION
