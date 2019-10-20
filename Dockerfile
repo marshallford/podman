@@ -1,4 +1,4 @@
-FROM golang:1.13.1-alpine3.10 AS builder
+FROM golang:1.13.2-alpine3.10 AS builder
 
 ARG CONMON_VERSION
 ARG RUNC_VERSION
