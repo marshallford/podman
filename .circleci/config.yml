@@ -12,7 +12,7 @@ jobs:
         name: Install Docker client
         command: curl -L -o /tmp/docker.tgz https://download.docker.com/linux/static/stable/x86_64/docker-18.09.3.tgz && tar -xz -C /tmp -f /tmp/docker.tgz && mv /tmp/docker/* /usr/bin
     - setup_remote_docker:
-        docker_layer_caching: true
+        docker_layer_caching: false
         version: 18.09.3
     - run:
         name: Build
