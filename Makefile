@@ -14,7 +14,7 @@ else
 endif
 
 IMAGE_NAME = $(IMAGE_NAME_PREFIX)/podman
-RUN = docker run --rm --privileged -v /tmp/podman:/var/lib/containers
+RUN = docker run -i --rm --privileged -v /tmp/podman:/var/lib/containers
 PODMAN_RUN = $(RUN) $(IMAGE_NAME):latest
 
 build: build/podman build/podman-remote
@@ -47,12 +47,16 @@ version:
 info:
 	$(PODMAN_RUN) info
 
-test:
-	$(PODMAN_RUN) run --rm alpine echo hello from alpine in podman container
+test: test/run test/build
+
+test/run:
+	$(PODMAN_RUN) run --rm alpine echo hello from alpine run by podman
+
+test/build:
+	printf "FROM alpine\nRUN echo hello from container built via podman" | $(PODMAN_RUN) build -
 
 dive:
-	docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock \
-  wagoodman/dive:v0.7.2 $(IMAGE_NAME):latest
+	docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:v0.9.1 $(IMAGE_NAME):latest
 
 .PHONY: \
 	build \
@@ -65,4 +69,6 @@ dive:
 	version \
 	info \
 	test \
+	test/run \
+	test/build \
 	dive
