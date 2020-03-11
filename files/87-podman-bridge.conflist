@@ -9,11 +9,7 @@
       "ipMasq": true,
       "ipam": {
         "type": "host-local",
-        "routes": [
-          {
-            "dst": "0.0.0.0/0"
-          }
-        ],
+        "routes": [{ "dst": "0.0.0.0/0" }],
         "ranges": [
           [
             {
@@ -31,8 +27,7 @@
       }
     },
     {
-      "type": "firewall",
-      "backend": "iptables"
+      "type": "firewall"
     },
     {
       "type": "tuning"

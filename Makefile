@@ -56,7 +56,7 @@ test/build:
 	printf "FROM alpine\nRUN echo hello from container built via podman" | $(PODMAN_RUN) build -
 
 dive:
-	docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:v0.9.1 $(IMAGE_NAME):latest
+	docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:v0.9.2 $(IMAGE_NAME):latest
 
 .PHONY: \
 	build \
